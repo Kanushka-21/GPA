@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semester-Wise GPA Tracker</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 16px;
+            font-size: 0.9rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 16px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.3rem;
+            color: var(--primary);
+        }
+
+        .gpa-display {
+            font-size: 1rem;
+            font-weight: bold;
+            background: #e0e7ff;
+            color: var(--primary);
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 18px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 1.1rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: end;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: #475569;
+        }
+
+        input, select {
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            padding: 8px 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-weight: 600;
+            color: #64748b;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .semester-section {
+            margin-bottom: 24px;
+        }
+
+        .semester-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f1f5f9;
+            padding: 10px 16px;
+            border-radius: 6px 6px 0 0;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .table-grade-select {
+            padding: 4px 6px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: #fff;
+            font-size: 0.85rem;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Semester-Wise Academic Tracker</h1>
+        <div class="gpa-display">Overall Cumulative GPA: <span id="overallGPA">0.00</span></div>
+    </header>
+
+    <div class="card">
+        <h2>Add Course Result</h2>
+        <form id="courseForm" class="form-grid">
+            <div class="input-group">
+                <label for="semester">Semester</label>
+                <select id="semester" required>
+                    <option value="100 Level Semester I">100 Level Semester I</option>
+                    <option value="100 Level Semester II">100 Level Semester II</option>
+                    <option value="200 Level Semester I">200 Level Semester I</option>
+                    <option value="200 Level Semester II">200 Level Semester II</option>
+                    <option value="300 Level Semester I">300 Level Semester I</option>
+                    <option value="300 Level Semester II">300 Level Semester II</option>
+                    <option value="400 Level Semester I">400 Level Semester I</option>
+                    <option value="400 Level Semester II">400 Level Semester II</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="courseCode">Course Code</label>
+                <input type="text" id="courseCode" required placeholder="e.g. CST 124-2">
+            </div>
+            <div class="input-group">
+                <label for="courseName">Course Name</label>
+                <input type="text" id="courseName" required placeholder="e.g. Web Dev">
+            </div>
+            <div class="input-group">
+                <label for="credits">Credits</label>
+                <input type="number" id="credits" min="1" max="10" required placeholder="2">
+            </div>
+            <div class="input-group">
+                <label for="grade">Grade</label>
+                <select id="grade" required>
+                    <option value="4.0|A+">A+</option>
+                    <option value="4.0|A">A</option>
+                    <option value="3.7|A-">A-</option>
+                    <option value="3.3|B+">B+</option>
+                    <option value="3.0|B">B</option>
+                    <option value="2.7|B-">B-</option>
+                    <option value="2.3|C+">C+</option>
+                    <option value="2.0|C">C</option>
+                    <option value="1.3|D+">D+</option>
+                    <option value="1.0|D">D</option>
+                    <option value="0.0|E / F">E / F</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="isGPA">Include in GPA</label>
+                <select id="isGPA">
+                    <option value="true">Yes</option>
+                    <option value="false">No (Non-GPA)</option>
+                </select>
+            </div>
+            <button type="submit" style="grid-column: 1 / -1;">Add Course</button>
+        </form>
+    </div>
+
+    <div class="card" id="semestersContainer">
+        <h2>Results by Semester</h2>
+    </div>
+</div>
+
+<script>
+    const gradeOptionsConfig = [
+        { text: "A+", point: 4.0 },
+        { text: "A", point: 4.0 },
+        { text: "A-", point: 3.7 },
+        { text: "B+", point: 3.3 },
+        { text: "B", point: 3.0 },
+        { text: "B-", point: 2.7 },
+        { text: "C+", point: 2.3 },
+        { text: "C", point: 2.0 },
+        { text: "D+", point: 1.3 },
+        { text: "D", point: 1.0 },
+        { text: "E / F", point: 0.0 }
+    ];
+
+    let courses = [
+        // 100 Level Sem I
+        { semester: "100 Level Semester I", code: "ESD 111-1", name: "English Language Level - I", credits: 1, gradePoint: 4.0, gradeText: "A+", includeGPA: true },
+        { semester: "100 Level Semester I", code: "CST 112-2", name: "Computer Systems Fundamentals", credits: 2, gradePoint: 3.0, gradeText: "B", includeGPA: true },
+        { semester: "100 Level Semester I", code: "ESD 122-2", name: "Communication Skills", credits: 2, gradePoint: 3.3, gradeText: "B+", includeGPA: true },
+        { semester: "100 Level Semester I", code: "CST 123-3", name: "Programming Concepts", credits: 3, gradePoint: 3.3, gradeText: "B+", includeGPA: true },
+        { semester: "100 Level Semester I", code: "CST 124-2", name: "Web Technologies", credits: 2, gradePoint: 4.0, gradeText: "A+", includeGPA: true },
+        { semester: "100 Level Semester I", code: "IIT 131-3", name: "Information Technology", credits: 3, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "100 Level Semester I", code: "ESD 141-2", name: "Professional Ethics", credits: 2, gradePoint: 3.0, gradeText: "B", includeGPA: true },
+        { semester: "100 Level Semester I", code: "ESD 152-1", name: "Sports", credits: 1, gradePoint: 3.0, gradeText: "B", includeGPA: true },
+        
+        // 100 Level Sem II
+        { semester: "100 Level Semester II", code: "CST 102-2", name: "Discrete Math for Computing", credits: 2, gradePoint: 3.7, gradeText: "A-", includeGPA: true },
+        { semester: "100 Level Semester II", code: "IESD 111-2", name: "Enhancement and Personal Skills", credits: 2, gradePoint: 3.3, gradeText: "B+", includeGPA: true },
+        { semester: "100 Level Semester II", code: "CST 121-2", name: "Data Structures", credits: 2, gradePoint: 3.0, gradeText: "B", includeGPA: true },
+        { semester: "100 Level Semester II", code: "IESD 121-2", name: "Sinhala / Tamil Language", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "100 Level Semester II", code: "CST 121-3", name: "Object Oriented Programming", credits: 3, gradePoint: 3.7, gradeText: "A-", includeGPA: true },
+        { semester: "100 Level Semester II", code: "IESD 121-2 (Eng)", name: "English Level II", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "100 Level Semester II", code: "IIT 121-3", name: "Database Systems", credits: 3, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "100 Level Semester II", code: "CST 122-2", name: "Software Engineering Principles", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "100 Level Semester II", code: "CST 131-2", name: "Computer Architecture", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "100 Level Semester II", code: "IESD 161-1", name: "Practical Training", credits: 1, gradePoint: 2.3, gradeText: "C+", includeGPA: true },
+
+        // 200 Level Sem I
+        { semester: "200 Level Semester I", code: "CST 232-2", name: "Data Communication and Networking", credits: 2, gradePoint: 3.3, gradeText: "B+", includeGPA: true },
+        { semester: "200 Level Semester I", code: "CST 242-3", name: "Software Engineering", credits: 3, gradePoint: 3.7, gradeText: "A-", includeGPA: true },
+        { semester: "200 Level Semester I", code: "IIT 232-3", name: "Financial Accounting", credits: 3, gradePoint: 3.3, gradeText: "B+", includeGPA: true },
+        { semester: "200 Level Semester I", code: "ESD 221-2", name: "English Language Level - III", credits: 2, gradePoint: 3.3, gradeText: "B+", includeGPA: true },
+        { semester: "200 Level Semester I", code: "BGE 211-2", name: "Aesthetic Studies", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "200 Level Semester I", code: "IIT 241-2", name: "Entrepreneurship", credits: 2, gradePoint: 4.0, gradeText: "A+", includeGPA: true },
+        { semester: "200 Level Semester I", code: "CST 213-2", name: "Discrete Mathematics", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "200 Level Semester I", code: "CST 241-3", name: "System Analysis and Design", credits: 3, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+
+        // 200 Level Sem II
+        { semester: "200 Level Semester II", code: "CST 226-2", name: "Web Application Development", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "200 Level Semester II", code: "IIT 223-2", name: "Information Technology Project Management", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "200 Level Semester II", code: "IIT 211-2", name: "Operational Research", credits: 2, gradePoint: 3.7, gradeText: "A-", includeGPA: true },
+        { semester: "200 Level Semester II", code: "IIT 233-2", name: "Management Accountancy", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "200 Level Semester II", code: "IIT 251-3", name: "Principles of Marketing", credits: 3, gradePoint: 3.3, gradeText: "B+", includeGPA: true },
+        { semester: "200 Level Semester II", code: "CST 243-3", name: "Rapid Application Development", credits: 3, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "200 Level Semester II", code: "CST 262-2", name: "Operating Systems Concepts and Compiler Designs", credits: 2, gradePoint: 3.7, gradeText: "A-", includeGPA: true },
+        { semester: "200 Level Semester II", code: "IIT 271-2", name: "Project - I", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+
+        // 300 Level Sem I
+        { semester: "300 Level Semester I", code: "CST 371-2", name: "Human Computer Interaction", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "300 Level Semester I", code: "CST 334-2", name: "Mobile Computing", credits: 2, gradePoint: 4.0, gradeText: "A+", includeGPA: true },
+        { semester: "300 Level Semester I", code: "CST 327-2", name: "Advanced Database Management Systems", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "300 Level Semester I", code: "ESD 311-1", name: "Communication Skills-II", credits: 1, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "300 Level Semester I", code: "CST 344-2", name: "Management Information Systems", credits: 2, gradePoint: 2.7, gradeText: "B-", includeGPA: true },
+        { semester: "300 Level Semester I", code: "IIT 301-2", name: "Data Structures and Algorithms", credits: 2, gradePoint: 3.0, gradeText: "B", includeGPA: true },
+        { semester: "300 Level Semester I", code: "IIT 311-3", name: "Statistical Methods - I", credits: 3, gradePoint: 3.7, gradeText: "A-", includeGPA: true },
+        { semester: "300 Level Semester I", code: "IIT 342-3", name: "Organizational Behavior", credits: 3, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "300 Level Semester I", code: "IIT 334-2", name: "Business Finance", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+
+        // 300 Level Sem II
+        { semester: "300 Level Semester II", code: "IIT 372-2", name: "Project - II", credits: 2, gradePoint: 3.7, gradeText: "A-", includeGPA: true },
+        { semester: "300 Level Semester II", code: "CST 346-2", name: "Software Quality Assurance", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "300 Level Semester II", code: "CST 347-2", name: "Software Architecture and Design Patterns", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "300 Level Semester II", code: "IIT 344-2", name: "Strategic Management", credits: 2, gradePoint: 3.7, gradeText: "A-", includeGPA: true },
+
+        // 400 Level Sem I
+        { semester: "400 Level Semester I", code: "IT 446-2", name: "Intellectual Property Rights, Legislation", credits: 2, gradePoint: 3.0, gradeText: "B", includeGPA: true },
+        { semester: "400 Level Semester I", code: "CST 497-2", name: "Social, Ethical and Professional Issues", credits: 2, gradePoint: 3.7, gradeText: "A-", includeGPA: true },
+        { semester: "400 Level Semester I", code: "CST 429-2", name: "Semantic Web Technologies", credits: 2, gradePoint: 3.7, gradeText: "A-", includeGPA: true },
+        { semester: "400 Level Semester I", code: "IIT 448-2", name: "Business Process Management", credits: 2, gradePoint: 3.3, gradeText: "B+", includeGPA: true },
+        { semester: "400 Level Semester I", code: "IIT 424-2", name: "Organizational Change and Development", credits: 2, gradePoint: 3.3, gradeText: "B+", includeGPA: true },
+        { semester: "400 Level Semester I", code: "CST 448-2", name: "Enterprise Resource Planning(ERP)", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "400 Level Semester I", code: "CST 436-2", name: "System Administration and Maintenance", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+
+        // 400 Level Sem II
+        { semester: "400 Level Semester II", code: "IIT 474-6", name: "Research Project", credits: 6, gradePoint: 3.7, gradeText: "A-", includeGPA: true },
+        { semester: "400 Level Semester II", code: "IIT 473-6", name: "Industrial Training", credits: 6, gradePoint: 4.0, gradeText: "A", includeGPA: false }
+    ];
+
+    const courseForm = document.getElementById('courseForm');
+    const semestersContainer = document.getElementById('semestersContainer');
+    const overallGPASpan = document.getElementById('overallGPA');
+
+    function renderTracker() {
+        semestersContainer.innerHTML = '<h2>Results by Semester</h2>';
+        
+        const semestersList = [
+            "100 Level Semester I", "100 Level Semester II",
+            "200 Level Semester I", "200 Level Semester II",
+            "300 Level Semester I", "300 Level Semester II",
+            "400 Level Semester I", "400 Level Semester II"
+        ];
+
+        let totalPoints = 0;
+        let totalCredits = 0;
+
+        semestersList.forEach(semName => {
+            const semCourses = courses.filter(c => c.semester === semName);
+            
+            let semPoints = 0;
+            let semCredits = 0;
+
+            semCourses.forEach(c => {
+                if (c.includeGPA) {
+                    semPoints += c.gradePoint * c.credits;
+                    semCredits += c.credits;
+                }
+            });
+
+            const semGPA = semCredits > 0 ? (semPoints / semCredits).toFixed(2) : '0.00';
+
+            totalPoints += semPoints;
+            totalCredits += semCredits;
+
+            const section = document.createElement('div');
+            section.className = 'semester-section';
+            
+            let tableRows = '';
+            courses.forEach((course, index) => {
+                if (course.semester === semName) {
+                    let dropdownOptions = '';
+                    gradeOptionsConfig.forEach(opt => {
+                        const isSelected = (opt.text === course.gradeText && opt.point === course.gradePoint) ? 'selected' : '';
+                        dropdownOptions += `<option value="${opt.point}|${opt.text}" ${isSelected}>${opt.text}</option>`;
+                    });
+
+                    tableRows += `
+                        <tr>
+                            <td><strong>${course.code}</strong></td>
+                            <td>${course.name}</td>
+                            <td>${course.credits}</td>
+                            <td>
+                                <select class="table-grade-select" onchange="updateCourseGrade(${index}, this.value)">
+                                    ${dropdownOptions}
+                                </select>
+                            </td>
+                            <td>${course.includeGPA ? 'Included' : 'Non-GPA'}</td>
+                            <td><button class="delete-btn" onclick="deleteCourse(${index})">Delete</button></td>
+                        </tr>
+                    `;
+                }
+            });
+
+            section.innerHTML = `
+                <div class="semester-header">
+                    <span>${semName}</span>
+                    <span>Semester GPA: ${semGPA}</span>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Course Name</th>
+                            <th>Credits</th>
+                            <th>Grade</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tableRows || '<tr><td colspan="6" style="text-align:center; color:#64748b;">No courses added yet.</td></tr>'}
+                    </tbody>
+                </table>
+            `;
+            semestersContainer.appendChild(section);
+        });
+
+        const overallGPA = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : '0.00';
+        overallGPASpan.textContent = overallGPA;
+    }
+
+    courseForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const semester = document.getElementById('semester').value;
+        const code = document.getElementById('courseCode').value;
+        const name = document.getElementById('courseName').value;
+        const credits = parseFloat(document.getElementById('credits').value);
+        const gradeValue = document.getElementById('grade').value.split('|');
+        const gradePoint = parseFloat(gradeValue[0]);
+        const gradeText = gradeValue[1];
+        const includeGPA = document.getElementById('isGPA').value === 'true';
+
+        courses.push({ semester, code, name, credits, gradePoint, gradeText, includeGPA });
+        renderTracker();
+        courseForm.reset();
+    });
+
+    window.updateCourseGrade = function(index, val) {
+        const parts = val.split('|');
+        courses[index].gradePoint = parseFloat(parts[0]);
+        courses[index].gradeText = parts[1];
+        renderTracker();
+    }
+
+    window.deleteCourse = function(index) {
+        courses.splice(index, 1);
+        renderTracker();
+    }
+
+    renderTracker();
+</script>
+
+</body>
+</html>
