@@ -348,12 +348,12 @@
     // Paste your own Firebase project's config here to enable cross-device cloud sync.
     // Until this is filled in, the app works fine using only this browser's local storage.
     const FIREBASE_CONFIG = {
-        apiKey: "PASTE_YOUR_API_KEY",
-        authDomain: "PASTE_YOUR_PROJECT_ID.firebaseapp.com",
-        projectId: "PASTE_YOUR_PROJECT_ID",
-        storageBucket: "PASTE_YOUR_PROJECT_ID.appspot.com",
-        messagingSenderId: "PASTE_YOUR_SENDER_ID",
-        appId: "PASTE_YOUR_APP_ID"
+        apiKey: "AIzaSyAZA4U9Rcs7w4oykziKmTTzfFLCLwkcgNQ",
+        authDomain: "gpa-cal-d9d54.firebaseapp.com",
+        projectId: "gpa-cal-d9d54",
+        storageBucket: "gpa-cal-d9d54.firebasestorage.app",
+        messagingSenderId: "713442318645",
+        appId: "1:713442318645:web:3ee4d7961f8fbd0e3ad47c"
     };
     const FIREBASE_READY = !!FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.startsWith('PASTE_');
     const db = FIREBASE_READY ? getFirestore(initializeApp(FIREBASE_CONFIG)) : null;
