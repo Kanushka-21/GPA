@@ -265,18 +265,10 @@
     </header>
 
     <div class="card">
-        <h2>Cloud Sync (Access from Any Device)</h2>
-        <p style="margin: -6px 0 12px; color: #64748b; font-size: 0.8rem;">
-            Set a private Sync Code once on each device to keep results identical everywhere. Treat this code like a password — anyone who has it can view and edit this data.
+        <h2>Cloud Sync</h2>
+        <p style="margin: -6px 0 0; color: #64748b; font-size: 0.8rem;">
+            Every device that opens this page automatically shares the same live database — no setup needed.
         </p>
-        <div class="form-grid" style="grid-template-columns: 2fr auto auto;">
-            <div class="input-group">
-                <label for="syncCodeInput">Sync Code</label>
-                <input type="text" id="syncCodeInput" placeholder="Enter the same code on every device">
-            </div>
-            <button type="button" id="connectSyncBtn">Connect</button>
-            <button type="button" id="generateSyncBtn">Generate New Code</button>
-        </div>
         <div id="syncStatus" style="margin-top:10px; font-size:0.8rem; font-weight:600;"></div>
     </div>
 
@@ -460,8 +452,9 @@
         return JSON.parse(JSON.stringify(defaultCourses));
     }
 
-    const SYNC_CODE_KEY = 'gpaTrackerSyncCode';
-    let syncCode = localStorage.getItem(SYNC_CODE_KEY) || '';
+    // Fixed document ID shared by every device that loads this page, so there's
+    // always exactly one database everyone reads from and writes to.
+    const FIXED_SYNC_CODE = '01bc6952-1903-426a-9d1c-84dabc8aecfc';
     let cloudUnsubscribe = null;
     let applyingRemoteUpdate = false;
     let lastKnownUpdatedAt = 0;
@@ -480,11 +473,11 @@
     }
 
     async function pushToCloud() {
-        if (!FIREBASE_READY || !syncCode || !db) return;
+        if (!FIREBASE_READY || !db) return;
         const writeTime = Date.now();
         lastKnownUpdatedAt = writeTime;
         try {
-            await setDoc(doc(db, 'gpaTrackers', syncCode), { courses, updatedAt: writeTime });
+            await setDoc(doc(db, 'gpaTrackers', FIXED_SYNC_CODE), { courses, updatedAt: writeTime });
         } catch (err) {
             console.error('Firestore write failed:', err);
             setSyncStatus('Could not save to cloud: ' + err.message, false);
@@ -496,23 +489,15 @@
         syncStatus.style.color = ok ? '#15803d' : '#b91c1c';
     }
 
-    function connectToCloud(code) {
+    function connectToCloud() {
         if (!FIREBASE_READY) {
             setSyncStatus("Cloud sync isn't configured on this deployment yet — using local-only storage.", false);
             return;
         }
-        if (!code) {
-            setSyncStatus('Enter a sync code first, or click "Generate New Code".', false);
-            return;
-        }
         if (cloudUnsubscribe) cloudUnsubscribe();
-
-        syncCode = code;
-        localStorage.setItem(SYNC_CODE_KEY, syncCode);
-        syncCodeInput.value = syncCode;
         setSyncStatus('Connecting...', true);
 
-        const ref = doc(db, 'gpaTrackers', syncCode);
+        const ref = doc(db, 'gpaTrackers', FIXED_SYNC_CODE);
         cloudUnsubscribe = onSnapshot(ref, (snap) => {
             if (snap.exists()) {
                 const data = snap.data();
@@ -535,7 +520,7 @@
                     console.error('Firestore initial write failed:', err);
                     setSyncStatus('Could not reach cloud storage: ' + err.message, false);
                 });
-                setSyncStatus('Connected — this device is now the source for this code.', true);
+                setSyncStatus('Connected — this device is now the source for this data.', true);
             }
         }, (err) => {
             console.error('Firestore listener error:', err);
@@ -576,9 +561,6 @@
     const semestersContainer = document.getElementById('semestersContainer');
     const overallGPASpan = document.getElementById('overallGPA');
     const resetBtn = document.getElementById('resetBtn');
-    const syncCodeInput = document.getElementById('syncCodeInput');
-    const connectSyncBtn = document.getElementById('connectSyncBtn');
-    const generateSyncBtn = document.getElementById('generateSyncBtn');
     const syncStatus = document.getElementById('syncStatus');
 
     function renderTracker() {
@@ -745,19 +727,8 @@
         renderTracker();
     }
 
-    connectSyncBtn.addEventListener('click', () => connectToCloud(syncCodeInput.value.trim()));
-    generateSyncBtn.addEventListener('click', () => connectToCloud(crypto.randomUUID()));
-
     renderTracker();
-
-    if (syncCode) {
-        syncCodeInput.value = syncCode;
-        connectToCloud(syncCode);
-    } else if (FIREBASE_READY) {
-        setSyncStatus('Not connected yet. Click "Generate New Code" to start syncing across your devices.', false);
-    } else {
-        setSyncStatus("Cloud sync isn't configured on this deployment yet — using local-only storage on this device.", false);
-    }
+    connectToCloud();
 </script>
 
 </body>
