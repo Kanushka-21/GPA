@@ -237,7 +237,10 @@
 <div class="container">
     <header>
         <h1>Semester-Wise Academic Tracker</h1>
-        <div class="gpa-display">Overall Cumulative GPA: <span id="overallGPA">0.00</span></div>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <div class="gpa-display">Overall Cumulative GPA: <span id="overallGPA">0.00</span></div>
+            <button id="resetBtn" type="button" class="delete-btn" style="width:auto;">Reset to Original</button>
+        </div>
     </header>
 
     <div class="card">
@@ -315,7 +318,9 @@
         { text: "E / F", point: 0.0 }
     ];
 
-    let courses = [
+    const STORAGE_KEY = 'gpaTrackerCourses';
+
+    const defaultCourses = [
         // 100 Level Sem I
         { semester: "100 Level Semester I", code: "ESD 111-1", name: "English Language Level - I", credits: 1, gradePoint: 4.0, gradeText: "A+", includeGPA: true },
         { semester: "100 Level Semester I", code: "CST 112-2", name: "Computer Systems Fundamentals", credits: 2, gradePoint: 3.0, gradeText: "B", includeGPA: true },
@@ -389,9 +394,28 @@
         { semester: "400 Level Semester II", code: "IIT 473-6", name: "Industrial Training", credits: 6, gradePoint: 4.0, gradeText: "A", includeGPA: false }
     ];
 
+    function loadCourses() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            try {
+                return JSON.parse(saved);
+            } catch (e) {
+                return JSON.parse(JSON.stringify(defaultCourses));
+            }
+        }
+        return JSON.parse(JSON.stringify(defaultCourses));
+    }
+
+    function saveCourses() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(courses));
+    }
+
+    let courses = loadCourses();
+
     const courseForm = document.getElementById('courseForm');
     const semestersContainer = document.getElementById('semestersContainer');
     const overallGPASpan = document.getElementById('overallGPA');
+    const resetBtn = document.getElementById('resetBtn');
 
     function renderTracker() {
         semestersContainer.innerHTML = '<h2>Results by Semester</h2>';
@@ -496,19 +520,30 @@
         const includeGPA = document.getElementById('isGPA').value === 'true';
 
         courses.push({ semester, code, name, credits, gradePoint, gradeText, includeGPA });
+        saveCourses();
         renderTracker();
         courseForm.reset();
+    });
+
+    resetBtn.addEventListener('click', () => {
+        if (confirm('Reset all results back to the original saved data? This will discard any changes you made.')) {
+            courses = JSON.parse(JSON.stringify(defaultCourses));
+            saveCourses();
+            renderTracker();
+        }
     });
 
     window.updateCourseGrade = function(index, val) {
         const parts = val.split('|');
         courses[index].gradePoint = parseFloat(parts[0]);
         courses[index].gradeText = parts[1];
+        saveCourses();
         renderTracker();
     }
 
     window.deleteCourse = function(index) {
         courses.splice(index, 1);
+        saveCourses();
         renderTracker();
     }
 
