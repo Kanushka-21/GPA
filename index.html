@@ -464,6 +464,7 @@
     let syncCode = localStorage.getItem(SYNC_CODE_KEY) || '';
     let cloudUnsubscribe = null;
     let applyingRemoteUpdate = false;
+    let lastKnownUpdatedAt = 0;
 
     function saveCourses() {
         try {
@@ -480,9 +481,12 @@
 
     async function pushToCloud() {
         if (!FIREBASE_READY || !syncCode || !db) return;
+        const writeTime = Date.now();
+        lastKnownUpdatedAt = writeTime;
         try {
-            await setDoc(doc(db, 'gpaTrackers', syncCode), { courses, updatedAt: Date.now() });
+            await setDoc(doc(db, 'gpaTrackers', syncCode), { courses, updatedAt: writeTime });
         } catch (err) {
+            console.error('Firestore write failed:', err);
             setSyncStatus('Could not save to cloud: ' + err.message, false);
         }
     }
@@ -511,19 +515,30 @@
         const ref = doc(db, 'gpaTrackers', syncCode);
         cloudUnsubscribe = onSnapshot(ref, (snap) => {
             if (snap.exists()) {
+                const data = snap.data();
+                const remoteUpdatedAt = data.updatedAt || 0;
+                if (remoteUpdatedAt < lastKnownUpdatedAt) {
+                    // This snapshot is older than an edit we already made locally — ignore it
+                    // so it can't overwrite a newer local change (fixes "added course disappears").
+                    setSyncStatus('Connected — synced across devices.', true);
+                    return;
+                }
+                lastKnownUpdatedAt = remoteUpdatedAt;
                 applyingRemoteUpdate = true;
-                courses = snap.data().courses || [];
+                courses = data.courses || [];
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(courses));
                 renderTracker();
                 applyingRemoteUpdate = false;
                 setSyncStatus('Connected — synced across devices.', true);
             } else {
                 setDoc(ref, { courses, updatedAt: Date.now() }).catch(err => {
+                    console.error('Firestore initial write failed:', err);
                     setSyncStatus('Could not reach cloud storage: ' + err.message, false);
                 });
                 setSyncStatus('Connected — this device is now the source for this code.', true);
             }
         }, (err) => {
+            console.error('Firestore listener error:', err);
             setSyncStatus('Cloud sync error: ' + err.message, false);
         });
     }
