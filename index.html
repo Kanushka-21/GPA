@@ -34,30 +34,53 @@
 
         header {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
+            gap: 14px;
             background: var(--card-bg);
-            padding: 16px 20px;
+            padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
             margin-bottom: 20px;
+            text-align: center;
         }
 
         h1 {
             margin: 0;
-            font-size: 1.3rem;
+            font-size: clamp(1.05rem, 4vw, 1.4rem);
             color: var(--primary);
         }
 
-        .gpa-display {
-            font-size: 1rem;
-            font-weight: bold;
+        .gpa-hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             background: #e0e7ff;
+            padding: 10px 28px;
+            border-radius: 12px;
+            line-height: 1.1;
+        }
+
+        .gpa-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #4338ca;
+        }
+
+        .gpa-value {
+            font-size: clamp(2.6rem, 14vw, 4rem);
+            font-weight: 800;
             color: var(--primary);
-            padding: 6px 12px;
-            border-radius: 6px;
+        }
+
+        @media (min-width: 640px) {
+            header {
+                flex-direction: row;
+                justify-content: space-between;
+                text-align: left;
+            }
         }
 
         .card {
@@ -223,17 +246,7 @@
             }
 
             header {
-                padding: 12px;
-            }
-
-            h1 {
-                font-size: 1.05rem;
-            }
-
-            .gpa-display {
-                width: 100%;
-                text-align: center;
-                font-size: 0.9rem;
+                padding: 14px;
             }
 
             .card {
@@ -245,6 +258,11 @@
                 align-items: flex-start;
                 gap: 6px;
                 font-size: 0.9rem;
+            }
+
+            /* 16px+ stops iOS Safari from auto-zooming the page when a field is tapped */
+            input, select, .table-edit-input, .table-grade-select {
+                font-size: 16px;
             }
         }
 
@@ -258,9 +276,9 @@
 <div class="container">
     <header>
         <h1>Semester-Wise Academic Tracker</h1>
-        <div style="display:flex; align-items:center; gap:10px;">
-            <div class="gpa-display">Overall Cumulative GPA: <span id="overallGPA">0.00</span></div>
-            <button id="resetBtn" type="button" class="delete-btn" style="width:auto;">Reset to Original</button>
+        <div class="gpa-hero">
+            <span class="gpa-label">Overall Cumulative GPA</span>
+            <span class="gpa-value" id="overallGPA">0.00</span>
         </div>
     </header>
 
@@ -560,7 +578,6 @@
     const courseForm = document.getElementById('courseForm');
     const semestersContainer = document.getElementById('semestersContainer');
     const overallGPASpan = document.getElementById('overallGPA');
-    const resetBtn = document.getElementById('resetBtn');
     const syncStatus = document.getElementById('syncStatus');
 
     function renderTracker() {
@@ -691,14 +708,6 @@
             showFormMessage(`Added "${code} - ${name}" successfully.`, 'success');
         } else {
             showFormMessage('Course added, but could not be saved to this browser\'s storage (it may be full or disabled in private browsing). It will be lost on reload.', 'error');
-        }
-    });
-
-    resetBtn.addEventListener('click', () => {
-        if (confirm('Reset all results back to the original saved data? This will discard any changes you made.')) {
-            courses = JSON.parse(JSON.stringify(defaultCourses));
-            saveCourses();
-            renderTracker();
         }
     });
 
