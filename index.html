@@ -189,6 +189,27 @@
             font-size: 0.85rem;
         }
 
+        .table-edit-input {
+            width: 100%;
+            padding: 4px 6px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            background: transparent;
+            font-size: 0.85rem;
+            font-family: inherit;
+            color: inherit;
+        }
+
+        .table-edit-input:hover {
+            border-color: var(--border);
+        }
+
+        .table-edit-input:focus {
+            border-color: var(--primary);
+            background: #fff;
+            outline: none;
+        }
+
         .delete-btn {
             background: #ef4444;
             padding: 4px 8px;
@@ -412,6 +433,14 @@
 
     let courses = loadCourses();
 
+    function escapeAttr(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
     const courseForm = document.getElementById('courseForm');
     const semestersContainer = document.getElementById('semestersContainer');
     const overallGPASpan = document.getElementById('overallGPA');
@@ -462,9 +491,9 @@
 
                     tableRows += `
                         <tr>
-                            <td><strong>${course.code}</strong></td>
-                            <td>${course.name}</td>
-                            <td>${course.credits}</td>
+                            <td><input class="table-edit-input" style="font-weight:600;" type="text" value="${escapeAttr(course.code)}" onchange="updateCourseField(${index}, 'code', this.value)"></td>
+                            <td><input class="table-edit-input" type="text" value="${escapeAttr(course.name)}" onchange="updateCourseField(${index}, 'name', this.value)"></td>
+                            <td><input class="table-edit-input" type="number" min="1" max="10" style="width:60px;" value="${course.credits}" onchange="updateCourseField(${index}, 'credits', this.value)"></td>
                             <td>
                                 <select class="table-grade-select" onchange="updateCourseGrade(${index}, this.value)">
                                     ${dropdownOptions}
@@ -537,6 +566,17 @@
         const parts = val.split('|');
         courses[index].gradePoint = parseFloat(parts[0]);
         courses[index].gradeText = parts[1];
+        saveCourses();
+        renderTracker();
+    }
+
+    window.updateCourseField = function(index, field, value) {
+        if (field === 'credits') {
+            const parsed = parseFloat(value);
+            courses[index].credits = isNaN(parsed) || parsed <= 0 ? 1 : parsed;
+        } else {
+            courses[index][field] = value;
+        }
         saveCourses();
         renderTracker();
     }
