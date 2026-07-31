@@ -265,6 +265,22 @@
     </header>
 
     <div class="card">
+        <h2>Cloud Sync (Access from Any Device)</h2>
+        <p style="margin: -6px 0 12px; color: #64748b; font-size: 0.8rem;">
+            Set a private Sync Code once on each device to keep results identical everywhere. Treat this code like a password — anyone who has it can view and edit this data.
+        </p>
+        <div class="form-grid" style="grid-template-columns: 2fr auto auto;">
+            <div class="input-group">
+                <label for="syncCodeInput">Sync Code</label>
+                <input type="text" id="syncCodeInput" placeholder="Enter the same code on every device">
+            </div>
+            <button type="button" id="connectSyncBtn">Connect</button>
+            <button type="button" id="generateSyncBtn">Generate New Code</button>
+        </div>
+        <div id="syncStatus" style="margin-top:10px; font-size:0.8rem; font-weight:600;"></div>
+    </div>
+
+    <div class="card">
         <h2>Add Course Result</h2>
         <form id="courseForm" class="form-grid">
             <div class="input-group">
@@ -290,7 +306,7 @@
             </div>
             <div class="input-group">
                 <label for="credits">Credits</label>
-                <input type="number" id="credits" min="1" max="10" required placeholder="2">
+                <input type="number" id="credits" min="1" max="10" required placeholder="e.g. 2">
             </div>
             <div class="input-group">
                 <label for="grade">Grade</label>
@@ -317,6 +333,7 @@
             </div>
             <button type="submit" style="grid-column: 1 / -1;">Add Course</button>
         </form>
+        <div id="formMessage" style="display:none; margin-top:12px; padding:10px 14px; border-radius:6px; font-size:0.85rem; font-weight:600;"></div>
     </div>
 
     <div class="card" id="semestersContainer">
@@ -324,7 +341,23 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Paste your own Firebase project's config here to enable cross-device cloud sync.
+    // Until this is filled in, the app works fine using only this browser's local storage.
+    const FIREBASE_CONFIG = {
+        apiKey: "PASTE_YOUR_API_KEY",
+        authDomain: "PASTE_YOUR_PROJECT_ID.firebaseapp.com",
+        projectId: "PASTE_YOUR_PROJECT_ID",
+        storageBucket: "PASTE_YOUR_PROJECT_ID.appspot.com",
+        messagingSenderId: "PASTE_YOUR_SENDER_ID",
+        appId: "PASTE_YOUR_APP_ID"
+    };
+    const FIREBASE_READY = !!FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.startsWith('PASTE_');
+    const db = FIREBASE_READY ? getFirestore(initializeApp(FIREBASE_CONFIG)) : null;
+
     const gradeOptionsConfig = [
         { text: "A+", point: 4.0 },
         { text: "A", point: 4.0 },
@@ -427,8 +460,91 @@
         return JSON.parse(JSON.stringify(defaultCourses));
     }
 
+    const SYNC_CODE_KEY = 'gpaTrackerSyncCode';
+    let syncCode = localStorage.getItem(SYNC_CODE_KEY) || '';
+    let cloudUnsubscribe = null;
+    let applyingRemoteUpdate = false;
+
     function saveCourses() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(courses));
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(courses));
+        } catch (e) {
+            console.error('Failed to save courses to localStorage:', e);
+            return false;
+        }
+        if (!applyingRemoteUpdate) {
+            pushToCloud();
+        }
+        return true;
+    }
+
+    async function pushToCloud() {
+        if (!FIREBASE_READY || !syncCode || !db) return;
+        try {
+            await setDoc(doc(db, 'gpaTrackers', syncCode), { courses, updatedAt: Date.now() });
+        } catch (err) {
+            setSyncStatus('Could not save to cloud: ' + err.message, false);
+        }
+    }
+
+    function setSyncStatus(text, ok) {
+        syncStatus.textContent = text;
+        syncStatus.style.color = ok ? '#15803d' : '#b91c1c';
+    }
+
+    function connectToCloud(code) {
+        if (!FIREBASE_READY) {
+            setSyncStatus("Cloud sync isn't configured on this deployment yet — using local-only storage.", false);
+            return;
+        }
+        if (!code) {
+            setSyncStatus('Enter a sync code first, or click "Generate New Code".', false);
+            return;
+        }
+        if (cloudUnsubscribe) cloudUnsubscribe();
+
+        syncCode = code;
+        localStorage.setItem(SYNC_CODE_KEY, syncCode);
+        syncCodeInput.value = syncCode;
+        setSyncStatus('Connecting...', true);
+
+        const ref = doc(db, 'gpaTrackers', syncCode);
+        cloudUnsubscribe = onSnapshot(ref, (snap) => {
+            if (snap.exists()) {
+                applyingRemoteUpdate = true;
+                courses = snap.data().courses || [];
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(courses));
+                renderTracker();
+                applyingRemoteUpdate = false;
+                setSyncStatus('Connected — synced across devices.', true);
+            } else {
+                setDoc(ref, { courses, updatedAt: Date.now() }).catch(err => {
+                    setSyncStatus('Could not reach cloud storage: ' + err.message, false);
+                });
+                setSyncStatus('Connected — this device is now the source for this code.', true);
+            }
+        }, (err) => {
+            setSyncStatus('Cloud sync error: ' + err.message, false);
+        });
+    }
+
+    const formMessage = document.getElementById('formMessage');
+    let formMessageTimer = null;
+
+    function showFormMessage(text, type) {
+        clearTimeout(formMessageTimer);
+        formMessage.textContent = text;
+        formMessage.style.display = 'block';
+        if (type === 'error') {
+            formMessage.style.background = '#fee2e2';
+            formMessage.style.color = '#b91c1c';
+        } else {
+            formMessage.style.background = '#dcfce7';
+            formMessage.style.color = '#15803d';
+        }
+        formMessageTimer = setTimeout(() => {
+            formMessage.style.display = 'none';
+        }, 4000);
     }
 
     let courses = loadCourses();
@@ -445,6 +561,10 @@
     const semestersContainer = document.getElementById('semestersContainer');
     const overallGPASpan = document.getElementById('overallGPA');
     const resetBtn = document.getElementById('resetBtn');
+    const syncCodeInput = document.getElementById('syncCodeInput');
+    const connectSyncBtn = document.getElementById('connectSyncBtn');
+    const generateSyncBtn = document.getElementById('generateSyncBtn');
+    const syncStatus = document.getElementById('syncStatus');
 
     function renderTracker() {
         semestersContainer.innerHTML = '<h2>Results by Semester</h2>';
@@ -538,20 +658,43 @@
 
     courseForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        
+
         const semester = document.getElementById('semester').value;
-        const code = document.getElementById('courseCode').value;
-        const name = document.getElementById('courseName').value;
-        const credits = parseFloat(document.getElementById('credits').value);
+        const code = document.getElementById('courseCode').value.trim();
+        const name = document.getElementById('courseName').value.trim();
+        const creditsRaw = document.getElementById('credits').value;
+        const credits = parseFloat(creditsRaw);
         const gradeValue = document.getElementById('grade').value.split('|');
         const gradePoint = parseFloat(gradeValue[0]);
         const gradeText = gradeValue[1];
         const includeGPA = document.getElementById('isGPA').value === 'true';
 
+        if (!code) {
+            showFormMessage('Please enter a Course Code.', 'error');
+            document.getElementById('courseCode').focus();
+            return;
+        }
+        if (!name) {
+            showFormMessage('Please enter a Course Name.', 'error');
+            document.getElementById('courseName').focus();
+            return;
+        }
+        if (!creditsRaw || isNaN(credits) || credits <= 0) {
+            showFormMessage('Please enter valid Credits (a number greater than 0). Note: the "2" shown is just a placeholder hint, not an actual value.', 'error');
+            document.getElementById('credits').focus();
+            return;
+        }
+
         courses.push({ semester, code, name, credits, gradePoint, gradeText, includeGPA });
-        saveCourses();
+        const saved = saveCourses();
         renderTracker();
         courseForm.reset();
+
+        if (saved) {
+            showFormMessage(`Added "${code} - ${name}" successfully.`, 'success');
+        } else {
+            showFormMessage('Course added, but could not be saved to this browser\'s storage (it may be full or disabled in private browsing). It will be lost on reload.', 'error');
+        }
     });
 
     resetBtn.addEventListener('click', () => {
@@ -587,7 +730,19 @@
         renderTracker();
     }
 
+    connectSyncBtn.addEventListener('click', () => connectToCloud(syncCodeInput.value.trim()));
+    generateSyncBtn.addEventListener('click', () => connectToCloud(crypto.randomUUID()));
+
     renderTracker();
+
+    if (syncCode) {
+        syncCodeInput.value = syncCode;
+        connectToCloud(syncCode);
+    } else if (FIREBASE_READY) {
+        setSyncStatus('Not connected yet. Click "Generate New Code" to start syncing across your devices.', false);
+    } else {
+        setSyncStatus("Cloud sync isn't configured on this deployment yet — using local-only storage on this device.", false);
+    }
 </script>
 
 </body>
