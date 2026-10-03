@@ -746,26 +746,41 @@
         }
     });
 
+    const fieldLabels = { code: 'course code', name: 'course name', credits: 'credits' };
+
+    // Re-rendering on cancel puts the table cell back to its saved value.
+    function confirmChange(message) {
+        if (confirm(message)) return true;
+        renderTracker();
+        return false;
+    }
+
     window.updateCourseGrade = function(index, val) {
         const parts = val.split('|');
-        courses[index].gradePoint = parseFloat(parts[0]);
-        courses[index].gradeText = parts[1];
+        const course = courses[index];
+        if (!confirmChange(`Are you sure you want to change the grade of "${course.code} - ${course.name}" from ${course.gradeText} to ${parts[1]}?`)) return;
+        course.gradePoint = parseFloat(parts[0]);
+        course.gradeText = parts[1];
         saveCourses();
         renderTracker();
     }
 
     window.updateCourseField = function(index, field, value) {
+        const course = courses[index];
+        let newValue = value;
         if (field === 'credits') {
             const parsed = parseFloat(value);
-            courses[index].credits = isNaN(parsed) || parsed <= 0 ? 1 : parsed;
-        } else {
-            courses[index][field] = value;
+            newValue = isNaN(parsed) || parsed <= 0 ? 1 : parsed;
         }
+        if (!confirmChange(`Are you sure you want to change the ${fieldLabels[field]} of "${course.code} - ${course.name}" from "${course[field]}" to "${newValue}"?`)) return;
+        course[field] = newValue;
         saveCourses();
         renderTracker();
     }
 
     window.deleteCourse = function(index) {
+        const course = courses[index];
+        if (!confirm(`Are you sure you want to delete "${course.code} - ${course.name}"? This cannot be undone.`)) return;
         courses.splice(index, 1);
         saveCourses();
         renderTracker();
