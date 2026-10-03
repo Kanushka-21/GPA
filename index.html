@@ -297,10 +297,7 @@
 
     <div class="card">
         <h2>Cloud Sync</h2>
-        <p style="margin: -6px 0 0; color: #64748b; font-size: 0.8rem;">
-            Every device that opens this page automatically shares the same live database — no setup needed.
-        </p>
-        <div id="syncStatus" style="margin-top:10px; font-size:0.8rem; font-weight:600;"></div>
+        <div id="syncStatus" style="font-size:0.8rem; font-weight:600;"></div>
     </div>
 
     <div class="card">
@@ -549,7 +546,7 @@
                 if (remoteUpdatedAt < lastKnownUpdatedAt) {
                     // This snapshot is older than an edit we already made locally — ignore it
                     // so it can't overwrite a newer local change (fixes "added course disappears").
-                    setSyncStatus('Connected — synced across devices.', true);
+                    setSyncStatus('Connected — synced', true);
                     return;
                 }
                 lastKnownUpdatedAt = remoteUpdatedAt;
@@ -557,7 +554,7 @@
                     courses = applyCorrections(data.courses || []);
                     saveCourses();
                     renderTracker();
-                    setSyncStatus('Connected — corrected results applied and synced.', true);
+                    setSyncStatus('Connected — synced', true);
                     return;
                 }
                 applyingRemoteUpdate = true;
@@ -565,7 +562,7 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(courses));
                 renderTracker();
                 applyingRemoteUpdate = false;
-                setSyncStatus('Connected — synced across devices.', true);
+                setSyncStatus('Connected — synced', true);
             } else {
                 courses = applyCorrections(courses);
                 renderTracker();
@@ -573,7 +570,7 @@
                     console.error('Firestore initial write failed:', err);
                     setSyncStatus('Could not reach cloud storage: ' + err.message, false);
                 });
-                setSyncStatus('Connected — this device is now the source for this data.', true);
+                setSyncStatus('Connected — synced', true);
             }
         }, (err) => {
             console.error('Firestore listener error:', err);
