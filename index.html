@@ -386,26 +386,24 @@
 
     const defaultCourses = [
         // 100 Level Sem I
-        { semester: "100 Level Semester I", code: "ESD 111-1", name: "English Language Level - I", credits: 1, gradePoint: 4.0, gradeText: "A+", includeGPA: true },
-        { semester: "100 Level Semester I", code: "CST 112-2", name: "Computer Systems Fundamentals", credits: 2, gradePoint: 3.0, gradeText: "B", includeGPA: true },
-        { semester: "100 Level Semester I", code: "ESD 122-2", name: "Communication Skills", credits: 2, gradePoint: 3.3, gradeText: "B+", includeGPA: true },
-        { semester: "100 Level Semester I", code: "CST 123-3", name: "Programming Concepts", credits: 3, gradePoint: 3.3, gradeText: "B+", includeGPA: true },
-        { semester: "100 Level Semester I", code: "CST 124-2", name: "Web Technologies", credits: 2, gradePoint: 4.0, gradeText: "A+", includeGPA: true },
-        { semester: "100 Level Semester I", code: "IIT 131-3", name: "Information Technology", credits: 3, gradePoint: 4.0, gradeText: "A", includeGPA: true },
-        { semester: "100 Level Semester I", code: "ESD 141-2", name: "Professional Ethics", credits: 2, gradePoint: 3.0, gradeText: "B", includeGPA: true },
-        { semester: "100 Level Semester I", code: "ESD 152-1", name: "Sports", credits: 1, gradePoint: 3.0, gradeText: "B", includeGPA: true },
-        
+        { semester: "100 Level Semester I", code: "CST 102-2", name: "Introduction to Computer Science", credits: 2, gradePoint: 3.7, gradeText: "A-", includeGPA: true },
+        { semester: "100 Level Semester I", code: "CST 111-2", name: "Essential Mathematics", credits: 2, gradePoint: 3.3, gradeText: "B+", includeGPA: true },
+        { semester: "100 Level Semester I", code: "BGE 121-2", name: "Ethics and Law Basics (T)", credits: 2, gradePoint: 3.0, gradeText: "B", includeGPA: true },
+        { semester: "100 Level Semester I", code: "CST 121-3", name: "Structured Programming", credits: 3, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "100 Level Semester I", code: "ESD 121-2", name: "English Language Level - 1", credits: 2, gradePoint: 3.7, gradeText: "A-", includeGPA: true },
+        { semester: "100 Level Semester I", code: "IIT 121-3", name: "Principles of Management", credits: 3, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "100 Level Semester I", code: "CST 122-2", name: "Web Programming", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "100 Level Semester I", code: "IESD 161-1", name: "Tamil Language", credits: 1, gradePoint: 2.3, gradeText: "C+", includeGPA: false },
+
         // 100 Level Sem II
-        { semester: "100 Level Semester II", code: "CST 102-2", name: "Discrete Math for Computing", credits: 2, gradePoint: 3.7, gradeText: "A-", includeGPA: true },
-        { semester: "100 Level Semester II", code: "IESD 111-2", name: "Enhancement and Personal Skills", credits: 2, gradePoint: 3.3, gradeText: "B+", includeGPA: true },
-        { semester: "100 Level Semester II", code: "CST 121-2", name: "Data Structures", credits: 2, gradePoint: 3.0, gradeText: "B", includeGPA: true },
-        { semester: "100 Level Semester II", code: "IESD 121-2", name: "Sinhala / Tamil Language", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
-        { semester: "100 Level Semester II", code: "CST 121-3", name: "Object Oriented Programming", credits: 3, gradePoint: 3.7, gradeText: "A-", includeGPA: true },
-        { semester: "100 Level Semester II", code: "IESD 121-2 (Eng)", name: "English Level II", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
-        { semester: "100 Level Semester II", code: "IIT 121-3", name: "Database Systems", credits: 3, gradePoint: 4.0, gradeText: "A", includeGPA: true },
-        { semester: "100 Level Semester II", code: "CST 122-2", name: "Software Engineering Principles", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
-        { semester: "100 Level Semester II", code: "CST 131-2", name: "Computer Architecture", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
-        { semester: "100 Level Semester II", code: "IESD 161-1", name: "Practical Training", credits: 1, gradePoint: 2.3, gradeText: "C+", includeGPA: true },
+        { semester: "100 Level Semester II", code: "ESD 111-1", name: "Communication Skills I", credits: 1, gradePoint: 4.0, gradeText: "A+", includeGPA: true },
+        { semester: "100 Level Semester II", code: "CST 112-2", name: "Calculus", credits: 2, gradePoint: 3.0, gradeText: "B", includeGPA: true },
+        { semester: "100 Level Semester II", code: "ESD 122-2", name: "English Language Level II", credits: 2, gradePoint: 3.3, gradeText: "B+", includeGPA: true },
+        { semester: "100 Level Semester II", code: "CST 123-3", name: "Database Management Systems", credits: 3, gradePoint: 3.3, gradeText: "B+", includeGPA: true },
+        { semester: "100 Level Semester II", code: "CST 124-2", name: "Object Oriented Programming", credits: 2, gradePoint: 4.0, gradeText: "A+", includeGPA: true },
+        { semester: "100 Level Semester II", code: "IIT 131-3", name: "Fundamentals of Economics", credits: 3, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "100 Level Semester II", code: "ESD 141-2", name: "Quantitative Reasoning", credits: 2, gradePoint: 3.0, gradeText: "B", includeGPA: true },
+        { semester: "100 Level Semester II", code: "ESD 162-1", name: "Tamil Language", credits: 1, gradePoint: 3.0, gradeText: "B", includeGPA: false },
 
         // 200 Level Sem I
         { semester: "200 Level Semester I", code: "CST 232-2", name: "Data Communication and Networking", credits: 2, gradePoint: 3.3, gradeText: "B+", includeGPA: true },
@@ -439,7 +437,10 @@
         { semester: "300 Level Semester I", code: "IIT 334-2", name: "Business Finance", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
 
         // 300 Level Sem II
+        { semester: "300 Level Semester II", code: "IIT 343-2", name: "Business Law", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "300 Level Semester II", code: "IIT 323-2", name: "Human Resource Management", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
         { semester: "300 Level Semester II", code: "IIT 372-2", name: "Project - II", credits: 2, gradePoint: 3.7, gradeText: "A-", includeGPA: true },
+        { semester: "300 Level Semester II", code: "CST 395-2", name: "Research Methodology and Scientific Writing", credits: 2, gradePoint: 3.0, gradeText: "B", includeGPA: true },
         { semester: "300 Level Semester II", code: "CST 346-2", name: "Software Quality Assurance", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
         { semester: "300 Level Semester II", code: "CST 347-2", name: "Software Architecture and Design Patterns", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
         { semester: "300 Level Semester II", code: "IIT 344-2", name: "Strategic Management", credits: 2, gradePoint: 3.7, gradeText: "A-", includeGPA: true },
@@ -477,6 +478,17 @@
     let applyingRemoteUpdate = false;
     let lastKnownUpdatedAt = 0;
 
+    // Bump DATA_VERSION and list the semesters whose defaults were corrected; the cloud
+    // copy then has just those semesters replaced once, leaving other edits untouched.
+    const DATA_VERSION = 3;
+    const CORRECTED_SEMESTERS = ["100 Level Semester I", "100 Level Semester II", "300 Level Semester II"];
+
+    function applyCorrections(list) {
+        const kept = list.filter(c => !CORRECTED_SEMESTERS.includes(c.semester));
+        const corrected = defaultCourses.filter(c => CORRECTED_SEMESTERS.includes(c.semester));
+        return JSON.parse(JSON.stringify(corrected)).concat(kept);
+    }
+
     function saveCourses() {
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(courses));
@@ -495,7 +507,7 @@
         const writeTime = Date.now();
         lastKnownUpdatedAt = writeTime;
         try {
-            await setDoc(doc(db, 'gpaTrackers', FIXED_SYNC_CODE), { courses, updatedAt: writeTime });
+            await setDoc(doc(db, 'gpaTrackers', FIXED_SYNC_CODE), { courses, updatedAt: writeTime, dataVersion: DATA_VERSION });
         } catch (err) {
             console.error('Firestore write failed:', err);
             setSyncStatus('Could not save to cloud: ' + err.message, false);
@@ -527,6 +539,13 @@
                     return;
                 }
                 lastKnownUpdatedAt = remoteUpdatedAt;
+                if ((data.dataVersion || 0) < DATA_VERSION) {
+                    courses = applyCorrections(data.courses || []);
+                    saveCourses();
+                    renderTracker();
+                    setSyncStatus('Connected — corrected results applied and synced.', true);
+                    return;
+                }
                 applyingRemoteUpdate = true;
                 courses = data.courses || [];
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(courses));
@@ -534,7 +553,9 @@
                 applyingRemoteUpdate = false;
                 setSyncStatus('Connected — synced across devices.', true);
             } else {
-                setDoc(ref, { courses, updatedAt: Date.now() }).catch(err => {
+                courses = applyCorrections(courses);
+                renderTracker();
+                setDoc(ref, { courses, updatedAt: Date.now(), dataVersion: DATA_VERSION }).catch(err => {
                     console.error('Firestore initial write failed:', err);
                     setSyncStatus('Could not reach cloud storage: ' + err.message, false);
                 });
