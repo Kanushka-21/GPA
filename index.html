@@ -204,7 +204,20 @@
             font-size: 0.95rem;
         }
 
+        th, .delete-btn, .status-cell {
+            white-space: nowrap;
+        }
+
+        .code-input {
+            min-width: 110px;
+        }
+
+        .name-input {
+            min-width: 220px;
+        }
+
         .table-grade-select {
+            min-width: 76px;
             padding: 4px 6px;
             border: 1px solid var(--border);
             border-radius: 4px;
@@ -393,6 +406,7 @@
         { semester: "100 Level Semester I", code: "ESD 121-2", name: "English Language Level - 1", credits: 2, gradePoint: 3.7, gradeText: "A-", includeGPA: true },
         { semester: "100 Level Semester I", code: "IIT 121-3", name: "Principles of Management", credits: 3, gradePoint: 4.0, gradeText: "A", includeGPA: true },
         { semester: "100 Level Semester I", code: "CST 122-2", name: "Web Programming", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
+        { semester: "100 Level Semester I", code: "CST 131-2", name: "Fundamentals of Computer Networks", credits: 2, gradePoint: 4.0, gradeText: "A", includeGPA: true },
         { semester: "100 Level Semester I", code: "IESD 161-1", name: "Tamil Language", credits: 1, gradePoint: 2.3, gradeText: "C+", includeGPA: false },
 
         // 100 Level Sem II
@@ -480,7 +494,7 @@
 
     // Bump DATA_VERSION and list the semesters whose defaults were corrected; the cloud
     // copy then has just those semesters replaced once, leaving other edits untouched.
-    const DATA_VERSION = 3;
+    const DATA_VERSION = 4;
     const CORRECTED_SEMESTERS = ["100 Level Semester I", "100 Level Semester II", "300 Level Semester II"];
 
     function applyCorrections(list) {
@@ -646,15 +660,15 @@
 
                     tableRows += `
                         <tr>
-                            <td><input class="table-edit-input" style="font-weight:600;" type="text" value="${escapeAttr(course.code)}" onchange="updateCourseField(${index}, 'code', this.value)"></td>
-                            <td><input class="table-edit-input" type="text" value="${escapeAttr(course.name)}" onchange="updateCourseField(${index}, 'name', this.value)"></td>
-                            <td><input class="table-edit-input" type="number" min="1" max="10" style="width:60px;" value="${course.credits}" onchange="updateCourseField(${index}, 'credits', this.value)"></td>
+                            <td><input class="table-edit-input code-input" style="font-weight:600;" type="text" value="${escapeAttr(course.code)}" onchange="updateCourseField(${index}, 'code', this.value)"></td>
+                            <td><input class="table-edit-input name-input" type="text" value="${escapeAttr(course.name)}" onchange="updateCourseField(${index}, 'name', this.value)"></td>
+                            <td><input class="table-edit-input" type="number" min="1" max="10" style="width:60px; min-width:60px;" value="${course.credits}" onchange="updateCourseField(${index}, 'credits', this.value)"></td>
                             <td>
                                 <select class="table-grade-select" onchange="updateCourseGrade(${index}, this.value)">
                                     ${dropdownOptions}
                                 </select>
                             </td>
-                            <td>${course.includeGPA ? 'Included' : 'Non-GPA'}</td>
+                            <td class="status-cell">${course.includeGPA ? 'Included' : 'Non-GPA'}</td>
                             <td><button class="delete-btn" onclick="deleteCourse(${index})">Delete</button></td>
                         </tr>
                     `;
